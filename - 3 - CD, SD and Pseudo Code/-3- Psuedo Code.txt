@@ -1,0 +1,218 @@
+MyPlayerController.h
+//Forward declare APlayerPaddle
+//Public
+//Create a Default Construction for the PlayerController class
+//Protected
+//Create a pointer to APlayerPaddle called myPawn
+//Protected
+//Create an overrided function called SetupInputComponent of return type void
+//Create a function called Move with the parameters float amount of return type void
+//Create a function called Serve with the return type of void
+//END MyPlayerController.h
+//
+MyPlayerController.cpp
+//SetupInputController()
+//Create an if statement that checks if InputComponent != nullptr
+	//Call the BindAxis function of InputComponent and pass in ("Move", this, &AMyPlayerController::Move)
+	//Call the BindAction function of InputComponent and pass in ("Serve", IE_Pressed, this, &AMyPlayerController::Serve)
+//END if
+//END SetupInputController()
+//
+//Move(float amount)
+//Create a Cast to APlayerPaddle named pawn that GetPawn() from APlayerPaddle
+//Create an if statement that checks if pawn != nullptr
+	//call the Move() function from pawn and pass in amount
+//END if
+//END Move(float amount)
+//
+//Serve()
+//Create a Cast to APlayerPaddle named pawn that GetPawn() from APlayerPaddle
+//Create an if statement that checks if pawn != nullptr
+	//call the Serve() function from pawn and pass in amount
+//END if
+//END Serve()
+//END MyPlayerController.cpp
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+PlayerPaddle.h
+//Public
+//Create a public function for Move of type void with the parameters of amount of type float
+//Create a public function for Serve of type void with no argument
+//Protected
+//Forward declare a UFLoatingPawnMovement pointer called FloatingPawnMovement
+//Create a UPROPERTY for a UStaticMeshComponent called StaticMesh
+//Create a UPROPERTY for a UCameraComponent called Camera
+//Create a URPROERTY for a USpringArmComponent called CameraArm
+//Private
+//Declare a float called Movement
+//END PlayerPaddle.h
+//
+PlayerPaddle.cpp
+//APlayerPaddle()
+//Declare FloatingPawnMovement by assigning it as a DefaultSubobject called "PawnMovement"
+//Declare a UBoxComponent by assigning it as a DefaultSubobject called "RootComponent"
+//SetWorldScale3D to 1.0f
+//SetBoxExtent to the following parameters (10.f,10.f,150.f)
+//SetRootComponent to be the Paddle
+//SetCollisionProfileName to "BlockAll"
+
+//Declare PaddleVisual by assigning it as a DefaultSubobject called "VisualRepresentation"
+//SetUpAttachment to the PaddleVisual by passing in the argument of RootComponent
+//Use a static ConstructionHelpers of FObjectFinder to the UStaticMesh and call it PaddleVisualAsset
+//Create an if statement to see if the VisualAsset succedded
+	//SetStaticMesh to the object
+	//SetRelativeLocation to offset the box extent
+	//SetWorldScale3D to 1.0f
+
+//Declare CameraArm by assigning it as a DefaultSubobject called "CameraSpringArm"
+//SetupAttachment to be the RootComponent
+//Set it's TargetArmLength to 5000.f
+
+//Declare CameraArm by assigning it as a DefaultSubobject called "CameraComponent"
+//SetProjectionMode with the parameters (ECameraProjectionMode::Orthographic)
+//SetOrthoWidth to 5000.f
+//SetUpAttachment of the camera to the CameraArm
+
+//Have the pawn automatically be possessed by calling AutoPossesPlayer and assigning it EAutoReceiveInput::Player0
+//End APlayerPaddle()
+
+//APlayerPaddle::Move(float amount)
+//Call Movement and assign it the value of amount * 5
+//End APlayerPaddle::Move
+
+//APlayerPaddle::Tick(float DeltaTime)
+//Create an if statement to see if Movement does not equal to 0
+	//Assign FVector NewLocation to GetActorLocation() plus (GetActorUpVector() * Movement);
+	//SetActionLocation() by giving it the argument of NewLocation
+//End if
+//End APlayerPaddle::Tick
+//END PlayerPaddle.cpp
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+Ball.h
+//Public
+//Create a default constructor for Ball
+//Protected
+//Create a UPROPERTY for a UStaticMeshComponent called BallMesh
+//Create a UPROPERTY for a UProjectileMovementComponent called BallMovement
+//Create a UParticleSystemComponent called OurParticleSystem
+//Public
+//Create a function called ParticleToggle() of type Void
+//Declare a UFUNCTION()
+//Call the function OnBallHit of type void with the following parameters
+	//AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit
+//Private
+//Declare a Variable called Iteration of type int32
+//Declare a Variable called TimeToSpawn of type int32
+//END Ball.h
+
+Ball.cpp
+//ABall()
+//Declare Ball by assigning it as a DefaultSubobject called ""RootComponent" of type USphereComponent
+//Make Ball the RootComponent
+//Call InitSphereRadius on Ball and give it the argument of 40.f
+//SetCollisionProfileName of ball to "BlockAll"
+
+//Declare SphereVisual by assigning it as a DefaultSubobject called "VisualRepresentation" of type UStaticMeshComponent
+//SetUpAttachment of the SphereVisual to Ball (or RootComponent)
+//Use a static ConstructionHelpers of FObjectFinder to the UStaticMesh and call it SphereVisualAsset
+//Create an if statement to see if the VisualAsset succedded
+	//SetStaticMesh to the object
+	//SetRelativeLocation to offset the Sphere radius
+	//SetWorldScale3D to 0.8f
+//END if
+//Create a new DefaultSubObject for BallMovement of type UProjectileMovement called "BallMovement"
+//Set BallMovement's ProjectileGravityScale to 0.f;
+//Set BallMovement's InitialSpeed to 2000.f;
+//Set BallMovement's MaxSpeed to 2000.f;
+//Set BallMovement's Friction to 0;
+//Set BallMovement's bShouldBounce to true;
+//Set BallMovement's Bounciness to 1.0f;
+//Create a new DefaultSubObject for OurParticleSystem of type UParticleSystemComponent called "MovementParticles"
+//SetupAttachment of OurParticleSystem to the SphereVisual
+//Set OurParticleSystem's bAutoActivate to true
+//Set OurParticleSystem's RelativeLocation to (FVector(0.f,0.f,20.f))
+//Create a static ConstructorHelpers for a FObjectFinder that finds a UParticleSystem named ParticleAsset in the starter content
+//if the Particle.Asset Succeeded in finding the object:
+	//Set OurParticleSystem's SetTemplate to an .Object
+	//Set OurPaticleSystem to ToggleActive()
+//END if
+//Set OnActorHit to AddDynamic(this, &ABall::OnBallHit);
+//END Ball()
+//
+//BeginPlay()
+//Super::BeingPlay()
+//END BeginPlay()
+//
+//Tick()
+//Super::Tick(DeltaTime)
+//END Tick()
+//
+//OnBallHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+//Create an if statement that creates a cast to APlayerGoal called PlayerGoal and have to relate to OtherActor
+	//Create an if statement that creates a cast to APongGame called GM that with the argument (GetWorld->GetAuthGameMode())
+		//Call GM's OnTargetHit() and pass in "Player"
+		//Call Ball's Destroy() function
+	//END if
+//END if
+//Create an if statement that creates a cast to APlayerGoal called EnemyGoal and have to relate to OtherActor
+	//Create an if statement that creates a cast to APongGame called GM that with the argument (GetWorld->GetAuthGameMode())
+		//Call GM's OnTargetHit() and pass in "Enemy"
+		//Call Ball's Destroy() function
+	//END if
+//END if
+//END OnBallHit()
+//
+//GetPhysicsComponent()
+//return a Cast of UPrimitiveComponent to the RootComponent
+//END GetPhysicsComponent
+//END Ball.cpp
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+PongGameState.h
+//Public
+//Create a default constructor for the PongGameState
+//Create an int32 called PlayerPoints
+//Create an int32 called EnemyPoints
+//End PongGameState.h
+PongGameState.cpp
+//APongGameState()
+//Set PlayerPoints to 0
+//Set EnemyPoints to 0
+//End PongGameState
+
+PongGameMode.h
+//Public
+//Create a default constructor for the PongGameMode
+//Create a function called OnTargetHit with the return value of Void and give FString Goal to it's parameters
+//Declare a UPROPERTY that with the parameters EditAnywhere and it's Category = "Game Rules"
+//Create an int32 called PointsToWin
+//End PongGameMode.h
+PongGameMode.cpp
+//OnTargetHit(FString Goal)
+//Create an if statement that checks if Goal is equal to the string "Player"
+	//Create an if statement that creates a cast to the PongGameState called GS
+		//Create an if statement that check if the Playerpoints is less than equal to the Points to Win
+		//Create an AddOnScreenDebugMessage that displays who won 
+//END if
+//Create an if statement that checks if Goal is equal to the string "Enemy"
+	//Create an if statement that creates a cast to the PongGameState called GS
+		//Create an if statement that check if the Enemypoints is less than equal to the Points to Win
+		//Create an AddOnScreenDebugMessage that displays who won 
+//END if
+//END PongGameMode.cpp
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	
+
+
